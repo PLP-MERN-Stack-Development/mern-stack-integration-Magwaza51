@@ -55,16 +55,29 @@ app.use((err, req, res, next) => {
 });
 
 // Connect to MongoDB and start server
+const mongoUri = process.env.MONGODB_URI;
+
+if (!mongoUri) {
+  console.error('MONGODB_URI is not defined in environment variables');
+  console.error('Please check your .env file and ensure MONGODB_URI is set');
+  process.exit(1);
+}
+
+console.log('Attempting to connect to MongoDB...');
+console.log('MongoDB URI:', mongoUri);
+
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(mongoUri)
   .then(() => {
-    console.log('Connected to MongoDB');
+    console.log('✅ Connected to MongoDB successfully');
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`📍 API available at: http://localhost:${PORT}`);
     });
   })
   .catch((err) => {
-    console.error('Failed to connect to MongoDB', err);
+    console.error('❌ Failed to connect to MongoDB:', err.message);
+    console.error('💡 Make sure MongoDB is running locally, or update MONGODB_URI in .env to use MongoDB Atlas');
     process.exit(1);
   });
 
